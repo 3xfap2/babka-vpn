@@ -1,0 +1,845 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
+  <title>БАБКА ВПН</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Lilita+One&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0b0b12;
+      --card: rgba(18, 18, 28, 0.95);
+      --card2: rgba(24, 24, 36, 0.98);
+      --accent: #ff6b2b;
+      --accent2: #ff8c55;
+      --green: #22c55e;
+      --green-dark: #16a34a;
+      --text: #ffffff;
+      --text-muted: #8b8ba0;
+      --border: rgba(255,255,255,0.07);
+      --nav-h: 68px;
+    }
+
+    html, body {
+      height: 100%;
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Inter', sans-serif;
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* BG gradient */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 80% 50% at 50% -10%, rgba(255,107,43,0.15) 0%, transparent 60%),
+        radial-gradient(ellipse 60% 40% at 80% 80%, rgba(34,197,94,0.06) 0%, transparent 50%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    #app {
+      position: relative;
+      z-index: 1;
+      min-height: 100%;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ── PAGES ── */
+    .page { display: none; flex-direction: column; flex: 1; padding-bottom: calc(var(--nav-h) + 8px); }
+    .page.active { display: flex; }
+
+    /* ── HEADER ── */
+    .logo-wrap {
+      padding: 20px 20px 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .logo-text {
+      font-family: 'Lilita One', cursive;
+      font-size: 28px;
+      background: linear-gradient(90deg, #ff6b2b, #ff9900);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      letter-spacing: 1px;
+    }
+    .logo-shield {
+      font-size: 28px;
+      margin-right: 10px;
+    }
+
+    /* ── CARDS ── */
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 20px;
+      margin: 12px 16px 0;
+    }
+
+    /* ── STATUS CARD ── */
+    .status-card {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      gap: 12px;
+      padding: 28px 20px;
+    }
+    .crown-icon {
+      width: 64px; height: 64px;
+      background: linear-gradient(135deg, rgba(255,107,43,0.2), rgba(255,107,43,0.05));
+      border: 1px solid rgba(255,107,43,0.3);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 28px;
+    }
+    .status-title {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--text-muted);
+    }
+    .status-active-label {
+      font-size: 13px;
+      color: var(--text-muted);
+      background: rgba(34,197,94,0.1);
+      border: 1px solid rgba(34,197,94,0.3);
+      border-radius: 20px;
+      padding: 4px 14px;
+    }
+    .status-active-label.active { color: var(--green); }
+
+    .sub-info-row {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 4px;
+      width: 100%;
+    }
+    .sub-label { font-size: 12px; color: var(--text-muted); }
+    .sub-value { font-size: 15px; font-weight: 600; }
+
+    /* ── BUTTONS ── */
+    .btn {
+      width: 100%;
+      padding: 14px 20px;
+      border: none;
+      border-radius: 14px;
+      font-size: 15px;
+      font-weight: 600;
+      font-family: 'Inter', sans-serif;
+      cursor: pointer;
+      transition: all 0.18s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+    .btn:active { transform: scale(0.97); }
+    .btn-orange {
+      background: linear-gradient(135deg, #ff6b2b, #ff8c55);
+      color: #fff;
+    }
+    .btn-orange:hover { background: linear-gradient(135deg, #ff7e42, #ff9966); }
+    .btn-green {
+      background: linear-gradient(135deg, #22c55e, #16a34a);
+      color: #fff;
+    }
+    .btn-green:disabled {
+      background: rgba(34,197,94,0.2);
+      color: rgba(34,197,94,0.4);
+      cursor: not-allowed;
+      transform: none;
+    }
+    .btn-outline {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+    }
+    .btn-outline:hover { border-color: rgba(255,255,255,0.2); color: var(--text); }
+    .btn-ghost {
+      background: rgba(255,255,255,0.05);
+      color: var(--text);
+    }
+    .btn-row { display: flex; gap: 10px; }
+    .btn-row .btn { flex: 1; }
+
+    /* ── PLAN CARDS ── */
+    .plan-card {
+      background: var(--card2);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 16px 18px;
+      margin: 8px 16px 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      cursor: pointer;
+      transition: all 0.18s ease;
+    }
+    .plan-card:active { transform: scale(0.98); }
+    .plan-card:hover { border-color: rgba(255,107,43,0.4); }
+    .plan-left { display: flex; flex-direction: column; gap: 3px; }
+    .plan-name { font-size: 16px; font-weight: 700; }
+    .plan-desc { font-size: 13px; color: var(--text-muted); }
+    .plan-price {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--accent);
+      white-space: nowrap;
+    }
+
+    /* ── SECTION TITLE ── */
+    .section-title {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      padding: 16px 20px 4px;
+    }
+
+    /* ── KEY DISPLAY ── */
+    .key-box {
+      background: rgba(34,197,94,0.08);
+      border: 1px solid rgba(34,197,94,0.25);
+      border-radius: 12px;
+      padding: 14px 16px;
+      font-family: monospace;
+      font-size: 13px;
+      word-break: break-all;
+      color: #a7f3d0;
+      cursor: pointer;
+      position: relative;
+    }
+    .key-box::after {
+      content: '📋';
+      position: absolute;
+      top: 10px; right: 12px;
+      font-size: 16px;
+    }
+    .key-copied {
+      font-size: 12px;
+      color: var(--green);
+      text-align: center;
+      margin-top: 4px;
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    .key-copied.show { opacity: 1; }
+
+    /* ── INSTALL STEPS ── */
+    .step-card {
+      background: var(--card2);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 14px 16px;
+      margin: 6px 16px 0;
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+    }
+    .step-num {
+      width: 30px; height: 30px; min-width: 30px;
+      background: linear-gradient(135deg, #ff6b2b, #ff9900);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 13px; font-weight: 700;
+    }
+    .step-text { flex: 1; }
+    .step-title { font-size: 14px; font-weight: 600; }
+    .step-desc { font-size: 13px; color: var(--text-muted); margin-top: 2px; }
+
+    /* ── APP CHOICE ── */
+    .app-row {
+      background: var(--card2);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 14px 16px;
+      margin: 6px 16px 0;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+    .app-row.recommended { border-color: rgba(255,107,43,0.4); }
+    .app-icon { font-size: 28px; }
+    .app-info { flex: 1; }
+    .app-name { font-size: 15px; font-weight: 600; }
+    .app-badge {
+      font-size: 10px; font-weight: 700; text-transform: uppercase;
+      color: var(--accent); background: rgba(255,107,43,0.15);
+      border-radius: 4px; padding: 2px 6px;
+    }
+
+    /* ── SUPPORT ROWS ── */
+    .support-row {
+      background: var(--card2);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 16px 18px;
+      margin: 8px 16px 0;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      text-decoration: none;
+      color: var(--text);
+      transition: border-color 0.18s;
+    }
+    .support-row:hover { border-color: rgba(255,255,255,0.2); }
+    .support-icon { font-size: 24px; }
+    .support-info { flex: 1; }
+    .support-name { font-size: 15px; font-weight: 600; }
+    .support-desc { font-size: 13px; color: var(--text-muted); }
+    .support-arrow { font-size: 18px; color: var(--text-muted); }
+
+    /* ── PROFILE ── */
+    .profile-avatar {
+      width: 72px; height: 72px;
+      background: linear-gradient(135deg, #ff6b2b, #ff9900);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 32px;
+      margin: 0 auto 12px;
+    }
+    .profile-name {
+      text-align: center;
+      font-size: 18px;
+      font-weight: 700;
+    }
+    .profile-id {
+      text-align: center;
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+    .info-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 13px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .info-row:last-child { border-bottom: none; }
+    .info-row-label { font-size: 14px; color: var(--text-muted); }
+    .info-row-value { font-size: 14px; font-weight: 600; }
+
+    /* ── BOTTOM NAV ── */
+    .bottom-nav {
+      position: fixed;
+      bottom: 0; left: 0; right: 0;
+      height: var(--nav-h);
+      background: rgba(10,10,18,0.97);
+      border-top: 1px solid var(--border);
+      display: flex;
+      backdrop-filter: blur(20px);
+      z-index: 100;
+      padding-bottom: env(safe-area-inset-bottom);
+    }
+    .nav-item {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      cursor: pointer;
+      border: none;
+      background: none;
+      color: var(--text-muted);
+      font-family: 'Inter', sans-serif;
+      font-size: 11px;
+      font-weight: 500;
+      transition: color 0.18s;
+      padding: 8px 0;
+    }
+    .nav-item.active { color: var(--accent); }
+    .nav-icon { font-size: 22px; }
+
+    /* ── LOADER ── */
+    .loader {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      flex: 1;
+      gap: 16px;
+    }
+    .spinner {
+      width: 40px; height: 40px;
+      border: 3px solid rgba(255,107,43,0.2);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── TOAST ── */
+    .toast {
+      position: fixed;
+      top: 20px; left: 50%; transform: translateX(-50%) translateY(-80px);
+      background: rgba(34,197,94,0.9);
+      color: #fff;
+      padding: 10px 20px;
+      border-radius: 20px;
+      font-size: 14px;
+      font-weight: 600;
+      transition: transform 0.3s ease;
+      z-index: 200;
+      white-space: nowrap;
+    }
+    .toast.show { transform: translateX(-50%) translateY(0); }
+
+    /* spacing helpers */
+    .mt8 { margin-top: 8px; }
+    .mt12 { margin-top: 12px; }
+    .mt16 { margin-top: 16px; }
+    .px16 { padding: 0 16px; }
+  </style>
+</head>
+<body>
+
+<div id="app">
+  <!-- LOADER -->
+  <div id="page-loader" class="page active">
+    <div class="loader">
+      <div class="spinner"></div>
+      <div style="color:var(--text-muted);font-size:14px">Загрузка...</div>
+    </div>
+  </div>
+
+  <!-- HOME PAGE -->
+  <div id="page-home" class="page">
+    <div class="logo-wrap">
+      <span class="logo-shield">🛡️</span>
+      <span class="logo-text">БАБКА ВПН</span>
+    </div>
+
+    <!-- Subscription status card -->
+    <div class="card status-card" id="status-card">
+      <div class="crown-icon">👑</div>
+      <div class="status-title" id="status-text">Нет активной подписки</div>
+      <span class="status-active-label" id="status-badge">Не активна</span>
+      <div id="key-section" style="display:none;width:100%">
+        <div id="key-box" class="key-box" onclick="copyKey()">...</div>
+        <div id="key-copied" class="key-copied">✓ Скопировано!</div>
+      </div>
+      <button id="btn-getkey" class="btn btn-green" onclick="getKey()" disabled>
+        🔑 Получить ключ
+      </button>
+    </div>
+
+    <!-- Active sub actions -->
+    <div id="active-actions" style="display:none">
+      <div class="px16 mt12">
+        <button class="btn btn-ghost" onclick="showPage('install')">
+          ⚙️ Установить и настроить
+        </button>
+      </div>
+    </div>
+
+    <!-- Plans section -->
+    <div class="section-title">Тарифы</div>
+
+    <div class="plan-card" onclick="buyPlan('week')">
+      <div class="plan-left">
+        <div class="plan-name">📅 Неделя</div>
+        <div class="plan-desc">7 дней полного доступа</div>
+      </div>
+      <div class="plan-price">15 ⭐</div>
+    </div>
+
+    <div class="plan-card" onclick="buyPlan('month')">
+      <div class="plan-left">
+        <div class="plan-name">📆 Месяц</div>
+        <div class="plan-desc">30 дней полного доступа</div>
+      </div>
+      <div class="plan-price">50 ⭐</div>
+    </div>
+
+    <div class="plan-card" id="trial-card" onclick="activateTrial()">
+      <div class="plan-left">
+        <div class="plan-name">🎁 Пробная</div>
+        <div class="plan-desc">7 дней бесплатно — подпишись на канал</div>
+      </div>
+      <div class="plan-price" style="color:var(--green)">FREE</div>
+    </div>
+  </div>
+
+  <!-- SUPPORT PAGE -->
+  <div id="page-support" class="page">
+    <div class="logo-wrap">
+      <span class="logo-shield">🛡️</span>
+      <span class="logo-text">БАБКА ВПН</span>
+    </div>
+    <div class="section-title">Поддержка</div>
+
+    <a class="support-row" href="https://t.me/Pardonsky" target="_blank">
+      <span class="support-icon">💬</span>
+      <div class="support-info">
+        <div class="support-name">Помощь</div>
+        <div class="support-desc">Написать в поддержку</div>
+      </div>
+      <span class="support-arrow">›</span>
+    </a>
+
+    <a class="support-row" href="https://t.me/Pardonsky" target="_blank">
+      <span class="support-icon">❓</span>
+      <div class="support-info">
+        <div class="support-name">FAQ</div>
+        <div class="support-desc">Частые вопросы и ответы</div>
+      </div>
+      <span class="support-arrow">›</span>
+    </a>
+
+    <a class="support-row" href="https://t.me/BabkaVPN" target="_blank">
+      <span class="support-icon">📢</span>
+      <div class="support-info">
+        <div class="support-name">Наш канал</div>
+        <div class="support-desc">@BabkaVPN — новости и акции</div>
+      </div>
+      <span class="support-arrow">›</span>
+    </a>
+  </div>
+
+  <!-- PROFILE PAGE -->
+  <div id="page-profile" class="page">
+    <div style="padding:24px 16px 0">
+      <div class="profile-avatar">👤</div>
+      <div class="profile-name" id="profile-name">—</div>
+      <div class="profile-id" id="profile-id">ID: —</div>
+    </div>
+
+    <div class="card mt12">
+      <div class="info-row">
+        <span class="info-row-label">Статус подписки</span>
+        <span class="info-row-value" id="p-status">—</span>
+      </div>
+      <div class="info-row">
+        <span class="info-row-label">Тариф</span>
+        <span class="info-row-value" id="p-type">—</span>
+      </div>
+      <div class="info-row">
+        <span class="info-row-label">Действует до</span>
+        <span class="info-row-value" id="p-end">—</span>
+      </div>
+    </div>
+
+    <div id="p-key-section" style="display:none">
+      <div class="section-title">Ваш VPN ключ</div>
+      <div class="card">
+        <div id="p-key-box" class="key-box" onclick="copyKey()">...</div>
+        <div id="p-key-copied" class="key-copied">✓ Скопировано!</div>
+        <button class="btn btn-ghost mt8" onclick="showPage('install')">
+          ⚙️ Как подключиться
+        </button>
+      </div>
+    </div>
+
+    <div class="section-title">Тарифы</div>
+    <div class="px16">
+      <div class="btn-row">
+        <button class="btn btn-orange" onclick="buyPlan('week')">📅 Неделя — 15 ⭐</button>
+        <button class="btn btn-orange" onclick="buyPlan('month')">📆 Месяц — 50 ⭐</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- INSTALL PAGE -->
+  <div id="page-install" class="page">
+    <div style="display:flex;align-items:center;gap:12px;padding:16px 16px 0">
+      <button onclick="goBack()" style="background:rgba(255,255,255,0.07);border:none;border-radius:10px;width:36px;height:36px;cursor:pointer;font-size:18px;color:#fff;display:flex;align-items:center;justify-content:center;">‹</button>
+      <span style="font-size:17px;font-weight:700">Установка и настройка</span>
+    </div>
+
+    <div class="section-title">Рекомендуемое приложение</div>
+    <div class="app-row recommended">
+      <span class="app-icon">🅗</span>
+      <div class="app-info">
+        <div style="display:flex;align-items:center;gap:8px">
+          <span class="app-name">Happ</span>
+          <span class="app-badge">Рекомендуем</span>
+        </div>
+        <div style="font-size:13px;color:var(--text-muted)">Лучший вариант для подключения</div>
+      </div>
+    </div>
+
+    <div class="section-title">Шаги установки</div>
+
+    <div class="step-card">
+      <div class="step-num">1</div>
+      <div class="step-text">
+        <div class="step-title">Скачайте Happ</div>
+        <div class="step-desc">Найдите в App Store / Google Play или скачайте APK</div>
+      </div>
+    </div>
+
+    <div class="step-card">
+      <div class="step-num">2</div>
+      <div class="step-text">
+        <div class="step-title">Скопируйте ваш ключ</div>
+        <div class="step-desc">Нажмите на ключ в разделе «Профиль» — он скопируется автоматически</div>
+      </div>
+    </div>
+
+    <div class="step-card">
+      <div class="step-num">3</div>
+      <div class="step-text">
+        <div class="step-title">Вставьте ключ в Happ</div>
+        <div class="step-desc">Откройте Happ → «+» → «Добавить конфигурацию» → вставьте ключ</div>
+      </div>
+    </div>
+
+    <div class="step-card">
+      <div class="step-num">4</div>
+      <div class="step-text">
+        <div class="step-title">Подключитесь</div>
+        <div class="step-desc">Нажмите кнопку подключения — готово! 🎉</div>
+      </div>
+    </div>
+
+    <div style="padding:16px">
+      <button id="install-copy-btn" class="btn btn-green" onclick="copyKeyFromInstall()">
+        🔑 Скопировать ключ
+      </button>
+    </div>
+  </div>
+
+  <!-- BOTTOM NAV -->
+  <nav class="bottom-nav">
+    <button class="nav-item active" id="nav-home" onclick="showPage('home')">
+      <span class="nav-icon">🏠</span>
+      <span>Главная</span>
+    </button>
+    <button class="nav-item" id="nav-support" onclick="showPage('support')">
+      <span class="nav-icon">💬</span>
+      <span>Поддержка</span>
+    </button>
+    <button class="nav-item" id="nav-profile" onclick="showPage('profile')">
+      <span class="nav-icon">👤</span>
+      <span>Профиль</span>
+    </button>
+  </nav>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+  const tg = window.Telegram.WebApp;
+  tg.ready();
+  tg.expand();
+  if (tg.setHeaderColor) tg.setHeaderColor('#0b0b12');
+  if (tg.setBackgroundColor) tg.setBackgroundColor('#0b0b12');
+
+  let userData = null;
+  let currentPage = 'loader';
+  let prevPage = 'home';
+  const NAV_PAGES = ['home', 'support', 'profile'];
+
+  // ── INIT ──
+  function init() {
+    try {
+      const hash = location.hash.slice(1);
+      if (hash) {
+        const json = atob(hash.replace(/-/g, '+').replace(/_/g, '/'));
+        const raw = JSON.parse(json);
+        userData = {
+          sub_active: raw.s === 1,
+          sub_type: raw.t,
+          sub_end: raw.e,
+          vpn_key: raw.k,
+          trial_used: raw.tr === 1,
+        };
+      }
+    } catch (e) {
+      console.error('Data parse error:', e);
+    }
+    renderUI();
+    showPage('home');
+  }
+
+  // ── RENDER ──
+  function renderUI() {
+    if (!userData) return;
+    const tgUser = tg.initDataUnsafe?.user || {};
+    const name = tgUser.first_name || tgUser.username || 'Пользователь';
+    const username = tgUser.username ? `@${tgUser.username}` : `ID: ${tgUser.id}`;
+
+    // Profile
+    document.getElementById('profile-name').textContent = name;
+    document.getElementById('profile-id').textContent = username;
+
+    const subActive = userData.sub_active;
+    const subType = userData.sub_type;
+    const subEnd = userData.sub_end;
+    const vpnKey = userData.vpn_key;
+
+    // Status card (home)
+    if (subActive) {
+      const typeLabel = { week: 'Неделя', month: 'Месяц', trial: 'Пробная' }[subType] || subType;
+      document.getElementById('status-text').textContent = `Подписка активна — ${typeLabel}`;
+      const badge = document.getElementById('status-badge');
+      badge.textContent = `до ${subEnd}`;
+      badge.classList.add('active');
+
+      const btn = document.getElementById('btn-getkey');
+      btn.disabled = false;
+      btn.onclick = getKey;
+
+      document.getElementById('active-actions').style.display = 'block';
+
+      // Profile status
+      document.getElementById('p-status').textContent = '✅ Активна';
+      document.getElementById('p-type').textContent = typeLabel;
+      document.getElementById('p-end').textContent = subEnd || '—';
+
+      if (vpnKey) {
+        document.getElementById('p-key-section').style.display = 'block';
+        document.getElementById('p-key-box').textContent = vpnKey;
+      }
+    } else {
+      document.getElementById('p-status').textContent = '❌ Нет подписки';
+      document.getElementById('p-type').textContent = '—';
+      document.getElementById('p-end').textContent = '—';
+    }
+
+    // Trial card
+    if (userData.trial_used || subActive) {
+      const tc = document.getElementById('trial-card');
+      tc.style.opacity = '0.4';
+      tc.style.pointerEvents = 'none';
+      tc.querySelector('.plan-desc').textContent =
+        userData.trial_used ? 'Пробная уже использована' : 'Подписка уже активна';
+    }
+  }
+
+  // ── PAGES ──
+  function showPage(name) {
+    if (!NAV_PAGES.includes(name)) {
+      // Sub-page (install)
+      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+      document.getElementById(`page-${name}`).classList.add('active');
+
+      // Show key on install page
+      if (name === 'install' && userData?.vpn_key) {
+        document.getElementById('install-copy-btn').textContent = '🔑 Скопировать ключ';
+      } else if (name === 'install') {
+        document.getElementById('install-copy-btn').style.display = 'none';
+      }
+      return;
+    }
+
+    prevPage = currentPage !== 'loader' ? currentPage : 'home';
+    currentPage = name;
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.getElementById(`page-${name}`).classList.add('active');
+
+    // Nav highlight
+    document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+    const navEl = document.getElementById(`nav-${name}`);
+    if (navEl) navEl.classList.add('active');
+  }
+
+  function goBack() {
+    if (NAV_PAGES.includes(prevPage)) {
+      showPage(prevPage);
+    } else {
+      showPage('home');
+    }
+  }
+
+  // ── ACTIONS ──
+  function buyPlan(type) {
+    if (!tg.initData) {
+      showToast('Откройте через Telegram', false);
+      return;
+    }
+    tg.sendData(JSON.stringify({ action: type === 'week' ? 'buy_week' : 'buy_month' }));
+  }
+
+  function activateTrial() {
+    if (!tg.initData) {
+      showToast('Откройте через Telegram', false);
+      return;
+    }
+    tg.sendData(JSON.stringify({ action: 'trial' }));
+  }
+
+  function getKey() {
+    if (!userData?.vpn_key) return;
+    const keyBox = document.getElementById('key-box');
+    const section = document.getElementById('key-section');
+    section.style.display = 'block';
+    keyBox.textContent = userData.vpn_key;
+    copyToClipboard(userData.vpn_key);
+    showToast('🔑 Ключ скопирован!');
+
+    // Flash copied
+    const copied = document.getElementById('key-copied');
+    copied.classList.add('show');
+    setTimeout(() => copied.classList.remove('show'), 2000);
+  }
+
+  function copyKey() {
+    if (!userData?.vpn_key) return;
+    copyToClipboard(userData.vpn_key);
+    showToast('🔑 Ключ скопирован!');
+
+    const copiedEls = document.querySelectorAll('.key-copied');
+    copiedEls.forEach(el => {
+      el.classList.add('show');
+      setTimeout(() => el.classList.remove('show'), 2000);
+    });
+  }
+
+  function copyKeyFromInstall() {
+    if (!userData?.vpn_key) return;
+    copyToClipboard(userData.vpn_key);
+    showToast('🔑 Ключ скопирован!');
+  }
+
+  function copyToClipboard(text) {
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(text).catch(() => fallbackCopy(text));
+    } else {
+      fallbackCopy(text);
+    }
+  }
+
+  function fallbackCopy(text) {
+    const el = document.createElement('textarea');
+    el.value = text;
+    el.style.position = 'fixed';
+    el.style.opacity = '0';
+    document.body.appendChild(el);
+    el.select();
+    document.execCommand('copy');
+    document.body.removeChild(el);
+  }
+
+  // ── TOAST ──
+  function showToast(msg, success = true) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.style.background = success
+      ? 'rgba(34,197,94,0.92)'
+      : 'rgba(239,68,68,0.92)';
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2000);
+  }
+
+  // ── START ──
+  init();
+</script>
+</body>
+</html>
