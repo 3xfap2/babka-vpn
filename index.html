@@ -648,9 +648,11 @@
   // ── INIT ──
   function init() {
     try {
-      const hash = location.hash.slice(1);
-      if (hash) {
-        const json = atob(hash.replace(/-/g, '+').replace(/_/g, '/'));
+      const params = new URLSearchParams(location.search);
+      const d = params.get('d');
+      console.log('[BabkaVPN] raw ?d param:', d ? d.slice(0, 40) + '...' : 'MISSING');
+      if (d) {
+        const json = atob(d.replace(/-/g, '+').replace(/_/g, '/'));
         const raw = JSON.parse(json);
         userData = {
           sub_active: raw.s === 1,
@@ -669,7 +671,7 @@
         }));
       }
     } catch (e) {
-      console.error('Data parse error:', e);
+      console.error('[BabkaVPN] Data parse error:', e);
     }
     renderUI();
     showPage('home');
