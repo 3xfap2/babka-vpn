@@ -661,6 +661,12 @@
           week_link: raw.wl,
           month_link: raw.ml,
         };
+        console.log('[BabkaVPN] userData:', JSON.stringify({
+          sub_active: userData.sub_active,
+          has_week_link: !!userData.week_link,
+          has_month_link: !!userData.month_link,
+          week_link_preview: userData.week_link ? userData.week_link.slice(0, 40) : null,
+        }));
       }
     } catch (e) {
       console.error('Data parse error:', e);
@@ -765,7 +771,8 @@
   function buyPlan(type) {
     const link = type === 'week' ? userData?.week_link : userData?.month_link;
     if (!link) {
-      showToast('Закройте и откройте приложение заново', false);
+      // Fallback: open bot with deep link so bot sends invoice directly
+      tg.openTelegramLink(`https://t.me/${BOT_USERNAME}?start=buy_${type}`);
       return;
     }
     tg.openInvoice(link, (status) => {
