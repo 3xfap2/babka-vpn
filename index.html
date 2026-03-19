@@ -695,77 +695,99 @@
     showPage('home');
   }
 
-  function setLetterAvatar(el, name) {
-    const letter = (name || '?')[0].toUpperCase();
-    el.style.background = 'linear-gradient(135deg, #ff6b2b, #ff9900)';
-    el.innerHTML = `<span style="font-size:30px;font-weight:700;color:#fff;line-height:1">${letter}</span>`;
-  }
-
   // ── RENDER ──
   function renderUI() {
-    // Name and ID: prefer bot data (userData) over Telegram initData (not always available on Desktop)
     const tgUser = tg.initDataUnsafe?.user || {};
+
+    // Name: bot data first, then Telegram initData
     const name = (userData?.first_name) || tgUser.first_name || tgUser.username || 'Пользователь';
     const userId = (userData?.user_id) || tgUser.id || '—';
-    document.getElementById('profile-name').textContent = name;
-    document.getElementById('profile-id').textContent = `ID: ${userId}`;
 
-    // Avatar: photo from Telegram if available, else letter avatar
-    const avatarEl = document.getElementById('profile-avatar');
-    if (tgUser.photo_url) {
-      const img = document.createElement('img');
-      img.src = tgUser.photo_url;
-      img.onerror = () => setLetterAvatar(avatarEl, name);
-      avatarEl.innerHTML = '';
-      avatarEl.style.background = 'none';
-      avatarEl.appendChild(img);
-    } else {
-      setLetterAvatar(avatarEl, name);
+    const profileName = document.getElementById('profile-name');
+    const profileId = document.getElementById('profile-id');
+    if (profileName) profileName.textContent = name;
+    if (profileId) profileId.textContent = `ID: ${userId}`;
+
+    // Avatar — letter avatar (photo_url not available on Desktop)
+    try {
+      const avatarEl = document.getElementById('profile-avatar');
+      if (avatarEl) {
+        if (tgUser.photo_url) {
+          const img = document.createElement('img');
+          img.src = tgUser.photo_url;
+          img.style.cssText = 'width:100%;height:100%;border-radius:50%;object-fit:cover';
+          img.onerror = () => {
+            avatarEl.innerHTML = '';
+            avatarEl.style.background = 'linear-gradient(135deg,#ff6b2b,#ff9900)';
+            const letter = name[0].toUpperCase();
+            avatarEl.innerHTML = `<span style="font-size:30px;font-weight:700;color:#fff">${letter}</span>`;
+          };
+          avatarEl.innerHTML = '';
+          avatarEl.style.background = 'none';
+          avatarEl.appendChild(img);
+        } else {
+          const letter = name[0].toUpperCase();
+          avatarEl.style.background = 'linear-gradient(135deg,#ff6b2b,#ff9900)';
+          avatarEl.innerHTML = `<span style="font-size:30px;font-weight:700;color:#fff">${letter}</span>`;
+        }
+      }
+    } catch (e) {
+      console.error('[BabkaVPN] avatar error:', e);
     }
 
-    if (!userData) return;
+    // Subscription info — always update, use defaults if no userData
+    const subActive = userData?.sub_active || false;
+    const subType = userData?.sub_type || null;
+    const subEnd = userData?.sub_end || null;
+    const vpnKey = userData?.vpn_key || null;
 
-    const subActive = userData.sub_active;
-    const subType = userData.sub_type;
-    const subEnd = userData.sub_end;
-    const vpnKey = userData.vpn_key;
-
-    // Status card (home)
     if (subActive) {
-      const typeLabel = { week: 'Неделя', month: 'Месяц', trial: 'Пробная' }[subType] || subType;
-      document.getElementById('status-text').textContent = `Подписка активна — ${typeLabel}`;
-      const badge = document.getElementById('status-badge');
-      badge.textContent = `до ${subEnd}`;
-      badge.classList.add('active');
+      const typeMap = { week: 'Неделя', month: 'Месяц', trial: 'Пробная', test: '🧪 Тест' };
+      const typeLabel = typeMap[subType] || subType || '—';
 
-      const btn = document.getElementById('btn-getkey');
-      btn.disabled = false;
-      btn.onclick = getKey;
+      // Home status card
+      const statusText = document.getElementById('status-text');
+      const statusBadge = document.getElementById('status-badge');
+      const btnGetkey = document.getElementById('btn-getkey');
+      const activeActions = document.getElementById('active-actions');
 
-      document.getElementById('active-actions').style.display = 'block';
+      if (statusText) statusText.textContent = `Подписка активна — ${typeLabel}`;
+      if (statusBadge) { statusBadge.textContent = `до ${subEnd}`; statusBadge.classList.add('active'); }
+      if (btnGetkey) { btnGetkey.disabled = false; btnGetkey.onclick = getKey; }
+      if (activeActions) activeActions.style.display = 'block';
 
-      // Profile status
-      document.getElementById('p-status').textContent = '✅ Активна';
-      document.getElementById('p-type').textContent = typeLabel;
-      document.getElementById('p-end').textContent = subEnd || '—';
+      // Profile card
+      const pStatus = document.getElementById('p-status');
+      const pType = document.getElementById('p-type');
+      const pEnd = document.getElementById('p-end');
+      if (pStatus) pStatus.innerHTML = '<span style="color:#22c55e">✅ Активна</span>';
+      if (pType) pType.textContent = typeLabel;
+      if (pEnd) pEnd.textContent = subEnd || '—';
 
       if (vpnKey) {
-        document.getElementById('p-key-section').style.display = 'block';
-        document.getElementById('p-key-box').textContent = vpnKey;
+        const pKeySection = document.getElementById('p-key-section');
+        const pKeyBox = document.getElementById('p-key-box');
+        if (pKeySection) pKeySection.style.display = 'block';
+        if (pKeyBox) pKeyBox.textContent = vpnKey;
       }
     } else {
-      document.getElementById('p-status').textContent = '❌ Нет подписки';
-      document.getElementById('p-type').textContent = '—';
-      document.getElementById('p-end').textContent = '—';
+      const pStatus = document.getElementById('p-status');
+      const pType = document.getElementById('p-type');
+      const pEnd = document.getElementById('p-end');
+      if (pStatus) pStatus.innerHTML = '<span style="color:#ef4444">❌ Нет подписки</span>';
+      if (pType) pType.textContent = '—';
+      if (pEnd) pEnd.textContent = '—';
     }
 
-    // Trial card
-    if (userData.trial_used || subActive) {
+    // Disable trial if used or sub active
+    if (userData?.trial_used || subActive) {
       const tc = document.getElementById('trial-card');
-      tc.style.opacity = '0.4';
-      tc.style.pointerEvents = 'none';
-      tc.querySelector('.plan-desc').textContent =
-        userData.trial_used ? 'Пробная уже использована' : 'Подписка уже активна';
+      if (tc) {
+        tc.style.opacity = '0.4';
+        tc.style.pointerEvents = 'none';
+        const desc = tc.querySelector('.plan-desc');
+        if (desc) desc.textContent = userData?.trial_used ? 'Пробная уже использована' : 'Подписка уже активна';
+      }
     }
   }
 
