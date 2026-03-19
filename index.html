@@ -677,6 +677,9 @@
           week_link: raw.wl,
           month_link: raw.ml,
           test_link: raw.tl,
+          user_id: raw.id,
+          first_name: raw.n,
+          username: raw.u,
         };
         console.log('[BabkaVPN] userData:', JSON.stringify({
           sub_active: userData.sub_active,
@@ -692,24 +695,32 @@
     showPage('home');
   }
 
+  function setLetterAvatar(el, name) {
+    const letter = (name || '?')[0].toUpperCase();
+    el.style.background = 'linear-gradient(135deg, #ff6b2b, #ff9900)';
+    el.innerHTML = `<span style="font-size:30px;font-weight:700;color:#fff;line-height:1">${letter}</span>`;
+  }
+
   // ── RENDER ──
   function renderUI() {
-    // Always render profile from Telegram data (available even without userData)
+    // Name and ID: prefer bot data (userData) over Telegram initData (not always available on Desktop)
     const tgUser = tg.initDataUnsafe?.user || {};
-    const name = tgUser.first_name || tgUser.username || 'Пользователь';
-    const userId = tgUser.id || '—';
+    const name = (userData?.first_name) || tgUser.first_name || tgUser.username || 'Пользователь';
+    const userId = (userData?.user_id) || tgUser.id || '—';
     document.getElementById('profile-name').textContent = name;
     document.getElementById('profile-id').textContent = `ID: ${userId}`;
 
-    // Telegram avatar
+    // Avatar: photo from Telegram if available, else letter avatar
+    const avatarEl = document.getElementById('profile-avatar');
     if (tgUser.photo_url) {
-      const avatarEl = document.getElementById('profile-avatar');
       const img = document.createElement('img');
       img.src = tgUser.photo_url;
-      img.onerror = () => { avatarEl.innerHTML = '👤'; avatarEl.style.background = 'linear-gradient(135deg,#ff6b2b,#ff9900)'; };
+      img.onerror = () => setLetterAvatar(avatarEl, name);
       avatarEl.innerHTML = '';
       avatarEl.style.background = 'none';
       avatarEl.appendChild(img);
+    } else {
+      setLetterAvatar(avatarEl, name);
     }
 
     if (!userData) return;
