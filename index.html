@@ -318,6 +318,12 @@
       display: flex; align-items: center; justify-content: center;
       font-size: 32px;
       margin: 0 auto 12px;
+      overflow: hidden;
+    }
+    .profile-avatar img {
+      width: 100%; height: 100%;
+      object-fit: cover;
+      border-radius: 50%;
     }
     .profile-name {
       text-align: center;
@@ -479,6 +485,14 @@
         <div class="plan-desc">3 дня бесплатно — подпишись на канал</div>
       </div>
       <div class="plan-price" style="color:var(--green)">FREE</div>
+    </div>
+
+    <div class="plan-card" id="test-card" onclick="buyPlan('test')">
+      <div class="plan-left">
+        <div class="plan-name">🧪 Тест</div>
+        <div class="plan-desc">Проверка системы оплаты</div>
+      </div>
+      <div class="plan-price" style="color:#60a5fa">1 ⭐</div>
     </div>
   </div>
 
@@ -662,6 +676,7 @@
           trial_used: raw.tr === 1,
           week_link: raw.wl,
           month_link: raw.ml,
+          test_link: raw.tl,
         };
         console.log('[BabkaVPN] userData:', JSON.stringify({
           sub_active: userData.sub_active,
@@ -679,14 +694,25 @@
 
   // ── RENDER ──
   function renderUI() {
-    if (!userData) return;
+    // Always render profile from Telegram data (available even without userData)
     const tgUser = tg.initDataUnsafe?.user || {};
     const name = tgUser.first_name || tgUser.username || 'Пользователь';
-    const username = tgUser.username ? `@${tgUser.username}` : `ID: ${tgUser.id}`;
-
-    // Profile
+    const userId = tgUser.id || '—';
     document.getElementById('profile-name').textContent = name;
-    document.getElementById('profile-id').textContent = username;
+    document.getElementById('profile-id').textContent = `ID: ${userId}`;
+
+    // Telegram avatar
+    if (tgUser.photo_url) {
+      const avatarEl = document.getElementById('profile-avatar');
+      const img = document.createElement('img');
+      img.src = tgUser.photo_url;
+      img.onerror = () => { avatarEl.innerHTML = '👤'; avatarEl.style.background = 'linear-gradient(135deg,#ff6b2b,#ff9900)'; };
+      avatarEl.innerHTML = '';
+      avatarEl.style.background = 'none';
+      avatarEl.appendChild(img);
+    }
+
+    if (!userData) return;
 
     const subActive = userData.sub_active;
     const subType = userData.sub_type;
@@ -771,9 +797,12 @@
   const BOT_USERNAME = 'alexandrlloxxbot';
 
   function buyPlan(type) {
-    const link = type === 'week' ? userData?.week_link : userData?.month_link;
+    let link;
+    if (type === 'week') link = userData?.week_link;
+    else if (type === 'month') link = userData?.month_link;
+    else if (type === 'test') link = userData?.test_link;
+
     if (!link) {
-      // Fallback: open bot with deep link so bot sends invoice directly
       tg.openTelegramLink(`https://t.me/${BOT_USERNAME}?start=buy_${type}`);
       return;
     }
