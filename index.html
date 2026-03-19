@@ -413,6 +413,60 @@
     }
     .toast.show { transform: translateX(-50%) translateY(0); }
 
+    /* ── FAQ ── */
+    .faq-item {
+      background: var(--card2);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      margin: 8px 16px 0;
+      overflow: hidden;
+      cursor: pointer;
+      transition: border-color 0.18s;
+    }
+    .faq-item:hover { border-color: rgba(255,107,43,0.35); }
+    .faq-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 18px;
+      gap: 12px;
+    }
+    .faq-q {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text);
+      flex: 1;
+      line-height: 1.4;
+    }
+    .faq-arrow {
+      font-size: 18px;
+      color: var(--accent);
+      transition: transform 0.25s ease;
+      flex-shrink: 0;
+    }
+    .faq-item.open .faq-arrow { transform: rotate(90deg); }
+    .faq-body {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.3s ease;
+    }
+    .faq-item.open .faq-body { max-height: 300px; }
+    .faq-a {
+      font-size: 13px;
+      color: var(--text-muted);
+      line-height: 1.65;
+      padding: 0 18px 16px;
+      border-top: 1px solid var(--border);
+      padding-top: 12px;
+    }
+
+    /* ── PAY WITH MONEY BUTTON ── */
+    .btn-money {
+      background: linear-gradient(135deg, #1d6fcf, #2b90e6);
+      color: #fff;
+    }
+    .btn-money:hover { background: linear-gradient(135deg, #2480df, #3aa0f6); }
+
     /* spacing helpers */
     .mt8 { margin-top: 8px; }
     .mt12 { margin-top: 12px; }
@@ -494,6 +548,12 @@
       </div>
       <div class="plan-price" style="color:#60a5fa">1 ⭐</div>
     </div>
+
+    <div style="padding: 12px 16px 0">
+      <button class="btn btn-money" onclick="payWithMoney()">
+        💳 Оплатить деньгами
+      </button>
+    </div>
   </div>
 
   <!-- SUPPORT PAGE -->
@@ -512,14 +572,14 @@
       <span class="support-arrow">›</span>
     </a>
 
-    <a class="support-row" href="https://t.me/Pardonsky" target="_blank">
+    <div class="support-row" style="cursor:pointer" onclick="showPage('faq')">
       <span class="support-icon">❓</span>
       <div class="support-info">
         <div class="support-name">FAQ</div>
         <div class="support-desc">Частые вопросы и ответы</div>
       </div>
       <span class="support-arrow">›</span>
-    </a>
+    </div>
 
     <a class="support-row" href="https://t.me/BabkaVPN" target="_blank">
       <span class="support-icon">📢</span>
@@ -623,6 +683,50 @@
     <div style="padding:16px">
       <button id="install-copy-btn" class="btn btn-green" onclick="copyKeyFromInstall()">
         🔑 Скопировать ключ
+      </button>
+    </div>
+  </div>
+
+  <!-- FAQ PAGE -->
+  <div id="page-faq" class="page">
+    <div style="display:flex;align-items:center;gap:12px;padding:16px 16px 0">
+      <button onclick="showPage('support')" style="background:rgba(255,255,255,0.07);border:none;border-radius:10px;width:36px;height:36px;cursor:pointer;font-size:18px;color:#fff;display:flex;align-items:center;justify-content:center;">‹</button>
+      <span style="font-size:17px;font-weight:700">Частые вопросы</span>
+    </div>
+
+    <div class="faq-item" onclick="toggleFaq(this)">
+      <div class="faq-header">
+        <div class="faq-q">Как начать пользоваться Бабка ВПН?</div>
+        <span class="faq-arrow">›</span>
+      </div>
+      <div class="faq-body">
+        <div class="faq-a">Выберите подходящий тариф и оформите подписку. Также доступен пробный период (один раз для новых пользователей). После оплаты вы получите инструкцию по установке — следуйте ей, чтобы настроить VPN.</div>
+      </div>
+    </div>
+
+    <div class="faq-item" onclick="toggleFaq(this)">
+      <div class="faq-header">
+        <div class="faq-q">Что делать, если после подключения пропал интернет?</div>
+        <span class="faq-arrow">›</span>
+      </div>
+      <div class="faq-body">
+        <div class="faq-a">Попробуйте отключить и снова включить VPN. Если это не помогло, перезагрузите устройство. В большинстве случаев это решает проблему.</div>
+      </div>
+    </div>
+
+    <div class="faq-item" onclick="toggleFaq(this)">
+      <div class="faq-header">
+        <div class="faq-q">На каких устройствах работает VPN?</div>
+        <span class="faq-arrow">›</span>
+      </div>
+      <div class="faq-body">
+        <div class="faq-a">Бабка ВПН поддерживается на Android, iOS, macOS, Windows и Smart TV.</div>
+      </div>
+    </div>
+
+    <div style="padding:16px">
+      <button class="btn btn-orange" onclick="tg.openTelegramLink('https://t.me/Pardonsky')">
+        💬 Задать вопрос в поддержку
       </button>
     </div>
   </div>
@@ -855,6 +959,15 @@
 
   function activateTrial() {
     tg.openTelegramLink(`https://t.me/${BOT_USERNAME}?start=trial`);
+  }
+
+  function payWithMoney() {
+    const text = encodeURIComponent('Привет! Хочу оплатить деньгами подписку в БАБКА ВПН на (Указать срок на который хочешь оформить впн)');
+    tg.openTelegramLink(`https://t.me/Pardonsky?text=${text}`);
+  }
+
+  function toggleFaq(el) {
+    el.classList.toggle('open');
   }
 
   function getKey() {
