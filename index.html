@@ -775,10 +775,17 @@
         const bytes = Uint8Array.from(atob(b64), c => c.charCodeAt(0));
         const json = new TextDecoder('utf-8').decode(bytes);
         const raw = JSON.parse(json);
+        // Client-side expiry check — in case URL was cached when sub was active
+        let isSubActive = raw.s === 1;
+        if (isSubActive && raw.e) {
+          const p = raw.e.split('.');
+          const endDate = new Date(parseInt(p[2]), parseInt(p[1]) - 1, parseInt(p[0]), 23, 59, 59);
+          if (endDate < new Date()) isSubActive = false;
+        }
         userData = {
-          sub_active: raw.s === 1,
-          sub_type: raw.t,
-          sub_end: raw.e,
+          sub_active: isSubActive,
+          sub_type: isSubActive ? raw.t : null,
+          sub_end: isSubActive ? raw.e : null,
           vpn_key: raw.k,
           trial_used: raw.tr === 1,
           week_link: raw.wl,
