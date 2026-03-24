@@ -199,28 +199,25 @@
       background: #1c0d00;
     }
     .plan-card:active { transform: scale(0.97); opacity: 0.85; }
-    .plan-card::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background-repeat: repeat;
-      background-size: 56px 56px;
-      opacity: 1;
-      pointer-events: none;
+    /* Photo backgrounds for plan cards */
+    .plan-week {
+      background-image: url('photo_2026-03-24_15-12-15%20(2).jpg');
+      background-size: cover;
+      background-position: center;
     }
-    /* Week — chevron arrows */
-    .plan-week::before {
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='56' height='56'%3E%3Cpath d='M6 16 L18 28 L6 40' stroke='%233d1e00' stroke-width='6' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3Cpath d='M22 16 L34 28 L22 40' stroke='%233d1e00' stroke-width='6' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+    .plan-month {
+      background-image: url('photo_2026-03-24_15-12-15.jpg');
+      background-size: cover;
+      background-position: center;
     }
-    /* Month — circles */
-    .plan-month::before {
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='56' height='56'%3E%3Ccircle cx='28' cy='28' r='18' stroke='%233d1e00' stroke-width='6' fill='none'/%3E%3C/svg%3E");
+    .plan-trial {
+      background-image: url('photo_2026-03-24_15-17-49.jpg');
+      background-size: cover;
+      background-position: center;
     }
-    /* Trial — gift boxes */
-    .plan-trial::before {
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='64'%3E%3Crect x='12' y='28' width='40' height='26' rx='4' stroke='%233d1e00' stroke-width='5' fill='none'/%3E%3Cline x1='32' y1='28' x2='32' y2='54' stroke='%233d1e00' stroke-width='5'/%3E%3Cline x1='12' y1='38' x2='52' y2='38' stroke='%233d1e00' stroke-width='5'/%3E%3Cpath d='M32 28 Q26 16 20 20 Q14 24 32 28' stroke='%233d1e00' stroke-width='4' fill='none'/%3E%3Cpath d='M32 28 Q38 16 44 20 Q50 24 32 28' stroke='%233d1e00' stroke-width='4' fill='none'/%3E%3C/svg%3E");
-    }
-    /* Test — key */
+    /* Test — keep SVG key pattern */
+    .plan-card::before { content: ''; position: absolute; inset: 0; background-repeat: repeat; background-size: 56px 56px; pointer-events: none; }
+    .plan-week::before, .plan-month::before, .plan-trial::before { display: none; }
     .plan-test::before {
       background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60'%3E%3Ccircle cx='18' cy='24' r='11' stroke='%233d1e00' stroke-width='5' fill='none'/%3E%3Cline x1='26' y1='32' x2='52' y2='50' stroke='%233d1e00' stroke-width='5' stroke-linecap='round'/%3E%3Cline x1='40' y1='43' x2='40' y2='52' stroke='%233d1e00' stroke-width='5' stroke-linecap='round'/%3E%3Cline x1='47' y1='47' x2='47' y2='54' stroke='%233d1e00' stroke-width='5' stroke-linecap='round'/%3E%3C/svg%3E");
     }
