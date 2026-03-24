@@ -493,7 +493,7 @@
 
     <!-- Subscription status card -->
     <div class="card status-card" id="status-card">
-      <div class="crown-icon">👑</div>
+      <div class="crown-icon" id="status-icon">❌</div>
       <div class="status-title" id="status-text">Нет активной подписки</div>
       <span class="status-active-label" id="status-badge">Не активна</span>
       <div id="key-section" style="display:none;width:100%">
@@ -594,7 +594,6 @@
   <!-- PROFILE PAGE -->
   <div id="page-profile" class="page">
     <div style="padding:24px 16px 0">
-      <div class="profile-avatar" id="profile-avatar"></div>
       <div class="profile-name" id="profile-name">—</div>
       <div class="profile-id" id="profile-id">ID: —</div>
     </div>
@@ -854,6 +853,8 @@
       const btnGetkey = document.getElementById('btn-getkey');
       const activeActions = document.getElementById('active-actions');
 
+      const statusIcon = document.getElementById('status-icon');
+      if (statusIcon) statusIcon.textContent = '👑';
       if (statusText) statusText.textContent = `Подписка активна — ${typeLabel}`;
       if (statusBadge) { statusBadge.textContent = `до ${subEnd}`; statusBadge.classList.add('active'); }
       if (btnGetkey) { btnGetkey.disabled = false; btnGetkey.onclick = getKey; }
