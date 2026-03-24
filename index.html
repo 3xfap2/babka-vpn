@@ -854,7 +854,7 @@
       const activeActions = document.getElementById('active-actions');
 
       const statusIcon = document.getElementById('status-icon');
-      if (statusIcon) statusIcon.textContent = '👑';
+      if (statusIcon) statusIcon.textContent = '✅';
       if (statusText) statusText.textContent = `Подписка активна — ${typeLabel}`;
       if (statusBadge) { statusBadge.textContent = `до ${subEnd}`; statusBadge.classList.add('active'); }
       if (btnGetkey) { btnGetkey.disabled = false; btnGetkey.onclick = getKey; }
