@@ -184,28 +184,87 @@
 
     /* ── PLAN CARDS ── */
     .plan-card {
-      background: var(--card2);
-      border: 1px solid var(--border);
+      position: relative;
+      overflow: hidden;
       border-radius: 16px;
-      padding: 16px 18px;
+      padding: 18px 20px;
       margin: 8px 16px 0;
+      min-height: 80px;
       display: flex;
       align-items: center;
       justify-content: space-between;
       cursor: pointer;
-      transition: all 0.18s ease;
+      transition: transform 0.15s ease, opacity 0.15s ease;
+      border: none;
+      background: #1c0d00;
     }
-    .plan-card:active { transform: scale(0.98); }
-    .plan-card:hover { border-color: rgba(255,107,43,0.4); }
-    .plan-left { display: flex; flex-direction: column; gap: 3px; }
-    .plan-name { font-size: 16px; font-weight: 700; }
-    .plan-desc { font-size: 13px; color: var(--text-muted); }
-    .plan-price {
-      font-size: 18px;
-      font-weight: 700;
+    .plan-card:active { transform: scale(0.97); opacity: 0.85; }
+    .plan-card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-repeat: repeat;
+      background-size: 56px 56px;
+      opacity: 1;
+      pointer-events: none;
+    }
+    /* Week — chevron arrows */
+    .plan-week::before {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='56' height='56'%3E%3Cpath d='M6 16 L18 28 L6 40' stroke='%233d1e00' stroke-width='6' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3Cpath d='M22 16 L34 28 L22 40' stroke='%233d1e00' stroke-width='6' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+    }
+    /* Month — circles */
+    .plan-month::before {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='56' height='56'%3E%3Ccircle cx='28' cy='28' r='18' stroke='%233d1e00' stroke-width='6' fill='none'/%3E%3C/svg%3E");
+    }
+    /* Trial — gift boxes */
+    .plan-trial::before {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='64'%3E%3Crect x='12' y='28' width='40' height='26' rx='4' stroke='%233d1e00' stroke-width='5' fill='none'/%3E%3Cline x1='32' y1='28' x2='32' y2='54' stroke='%233d1e00' stroke-width='5'/%3E%3Cline x1='12' y1='38' x2='52' y2='38' stroke='%233d1e00' stroke-width='5'/%3E%3Cpath d='M32 28 Q26 16 20 20 Q14 24 32 28' stroke='%233d1e00' stroke-width='4' fill='none'/%3E%3Cpath d='M32 28 Q38 16 44 20 Q50 24 32 28' stroke='%233d1e00' stroke-width='4' fill='none'/%3E%3C/svg%3E");
+    }
+    /* Test — key */
+    .plan-test::before {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60'%3E%3Ccircle cx='18' cy='24' r='11' stroke='%233d1e00' stroke-width='5' fill='none'/%3E%3Cline x1='26' y1='32' x2='52' y2='50' stroke='%233d1e00' stroke-width='5' stroke-linecap='round'/%3E%3Cline x1='40' y1='43' x2='40' y2='52' stroke='%233d1e00' stroke-width='5' stroke-linecap='round'/%3E%3Cline x1='47' y1='47' x2='47' y2='54' stroke='%233d1e00' stroke-width='5' stroke-linecap='round'/%3E%3C/svg%3E");
+    }
+    .plan-left { position: relative; display: flex; flex-direction: column; gap: 5px; z-index: 1; }
+    .plan-name {
+      font-size: 22px;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: #fff;
+      line-height: 1;
+      font-family: 'Lilita One', 'Inter', sans-serif;
+    }
+    .plan-desc { font-size: 12px; color: rgba(255,255,255,0.5); font-weight: 500; }
+    .plan-price-block {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 2px;
+      flex-shrink: 0;
+    }
+    .plan-price-rub {
+      font-size: 13px;
+      font-weight: 600;
+      color: rgba(255,255,255,0.45);
+      text-decoration: line-through;
+    }
+    .plan-price-stars {
+      font-size: 22px;
+      font-weight: 900;
       color: var(--accent);
       white-space: nowrap;
+      line-height: 1;
     }
+    .plan-price-free {
+      font-size: 22px;
+      font-weight: 900;
+      color: var(--green);
+      line-height: 1;
+    }
+    /* Legacy .plan-price for inline overrides */
+    .plan-price { font-size: 18px; font-weight: 700; color: var(--accent); white-space: nowrap; position: relative; z-index: 1; }
 
     /* ── SECTION TITLE ── */
     .section-title {
@@ -517,36 +576,46 @@
     <!-- Plans section -->
     <div class="section-title">Тарифы</div>
 
-    <div class="plan-card" onclick="buyPlan('week')">
+    <div class="plan-card plan-week" onclick="buyPlan('week')">
       <div class="plan-left">
-        <div class="plan-name">📅 Неделя</div>
+        <div class="plan-name">Неделя</div>
         <div class="plan-desc">7 дней полного доступа</div>
       </div>
-      <div class="plan-price">25 ⭐</div>
+      <div class="plan-price-block">
+        <div class="plan-price-rub">35₽</div>
+        <div class="plan-price-stars">25 ★</div>
+      </div>
     </div>
 
-    <div class="plan-card" onclick="buyPlan('month')">
+    <div class="plan-card plan-month" onclick="buyPlan('month')">
       <div class="plan-left">
-        <div class="plan-name">📆 Месяц</div>
+        <div class="plan-name">Месяц</div>
         <div class="plan-desc">30 дней полного доступа</div>
       </div>
-      <div class="plan-price">100 ⭐</div>
+      <div class="plan-price-block">
+        <div class="plan-price-rub">145₽</div>
+        <div class="plan-price-stars">100 ★</div>
+      </div>
     </div>
 
-    <div class="plan-card" id="trial-card" onclick="activateTrial()">
+    <div class="plan-card plan-trial" id="trial-card" onclick="activateTrial()">
       <div class="plan-left">
-        <div class="plan-name">🎁 Пробная</div>
+        <div class="plan-name">Пробная</div>
         <div class="plan-desc">3 дня бесплатно — подпишись на канал</div>
       </div>
-      <div class="plan-price" style="color:var(--green)">FREE</div>
+      <div class="plan-price-block">
+        <div class="plan-price-free">FREE</div>
+      </div>
     </div>
 
-    <div class="plan-card" id="test-card" onclick="buyPlan('test')">
+    <div class="plan-card plan-test" id="test-card" onclick="buyPlan('test')">
       <div class="plan-left">
-        <div class="plan-name">🧪 Тест</div>
+        <div class="plan-name">Тест</div>
         <div class="plan-desc">Проверка системы оплаты</div>
       </div>
-      <div class="plan-price" style="color:#60a5fa">1 ⭐</div>
+      <div class="plan-price-block">
+        <div class="plan-price-stars" style="color:#60a5fa">1 ★</div>
+      </div>
     </div>
 
     <div style="padding: 12px 16px 0">
