@@ -829,14 +829,6 @@
     <div class="pay-modal">
       <div class="pay-modal-title" id="pay-modal-title">Выберите способ оплаты</div>
       <div class="pay-modal-sub" id="pay-modal-sub">Неделя — 7 дней доступа</div>
-      <div class="pay-option" onclick="confirmPayStars()">
-        <div class="pay-option-icon">⭐</div>
-        <div class="pay-option-info">
-          <div class="pay-option-name">Telegram Stars</div>
-          <div class="pay-option-desc">Оплата внутри Telegram</div>
-        </div>
-        <div class="pay-option-price" id="pay-stars-price">25 ★</div>
-      </div>
       <div class="pay-option" onclick="confirmPayRubles()">
         <div class="pay-option-icon">💳</div>
         <div class="pay-option-info">
@@ -844,6 +836,14 @@
           <div class="pay-option-desc">Перевод через @Pardonsky</div>
         </div>
         <div class="pay-option-price" id="pay-rub-price">35 ₽</div>
+      </div>
+      <div class="pay-option" onclick="confirmPayStars()">
+        <div class="pay-option-icon">⭐</div>
+        <div class="pay-option-info">
+          <div class="pay-option-name">Telegram Stars</div>
+          <div class="pay-option-desc">Оплата внутри Telegram</div>
+        </div>
+        <div class="pay-option-price" id="pay-stars-price">25 ★</div>
       </div>
       <button class="pay-modal-cancel" onclick="closePayModal()">Отмена</button>
     </div>
