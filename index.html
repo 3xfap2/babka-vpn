@@ -946,6 +946,7 @@
           user_id: raw.id,
           first_name: raw.n,
           username: raw.u,
+          bot_username: raw.bn,
         };
         console.log('[BabkaVPN] userData:', JSON.stringify({
           sub_active: userData.sub_active,
@@ -1084,7 +1085,7 @@
   }
 
   // ── ACTIONS ──
-  const BOT_USERNAME = 'alexandrlloxxbot';
+  const BOT_USERNAME = userData?.bot_username || 'babka_vpnbot';
 
   // ── PAYMENT MODAL ──
   let _pendingPlanType = null;
