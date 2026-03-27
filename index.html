@@ -694,6 +694,16 @@
       </div>
     </div>
 
+    <div class="plan-card plan-test" id="test-card" style="display:none" onclick="buyPlan('test')">
+      <div class="plan-left">
+        <div class="plan-name">🧪 Тест</div>
+        <div class="plan-desc">Проверка системы оплаты</div>
+      </div>
+      <div class="plan-price-block">
+        <div class="plan-price-stars">1 ★</div>
+      </div>
+    </div>
+
   </div>
 
   <!-- SUPPORT PAGE -->
@@ -1103,6 +1113,13 @@
       if (pStatus) pStatus.innerHTML = '<span style="color:#ef4444">❌ Нет подписки</span>';
       if (pType) pType.textContent = '—';
       if (pEnd) pEnd.textContent = '—';
+    }
+
+    // Show test card for admins only
+    const ADMIN_IDS = [6849781575, 7565071317];
+    const testCard = document.getElementById('test-card');
+    if (testCard && ADMIN_IDS.includes(Number(userId))) {
+      testCard.style.display = '';
     }
 
     // Disable trial if used or sub active
