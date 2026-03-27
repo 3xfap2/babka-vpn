@@ -1024,6 +1024,7 @@
           first_name: raw.n,
           username: raw.u,
           bot_username: raw.bn,
+          api_url: raw.au || null,
         };
         console.log('[BabkaVPN] userData:', JSON.stringify({
           sub_active: userData.sub_active,
@@ -1037,6 +1038,34 @@
     }
     renderUI();
     showPage('home');
+    fetchFreshUserData();
+  }
+
+  async function fetchFreshUserData() {
+    try {
+      const initData = tg.initData;
+      if (!initData) return;
+      const apiBase = userData?.api_url;
+      if (!apiBase) return;
+      const res = await fetch(`${apiBase}/api/user`, {
+        headers: { 'X-Telegram-Init-Data': initData }
+      });
+      if (!res.ok) return;
+      const fresh = await res.json();
+      if (!userData) userData = {};
+      userData.trial_used = fresh.trial_used === true;
+      // re-render trial card only
+      const tc = document.getElementById('trial-card');
+      if (tc) {
+        if (userData.trial_used || userData.sub_active) {
+          tc.classList.add('plan-disabled');
+        } else {
+          tc.classList.remove('plan-disabled');
+        }
+      }
+    } catch (e) {
+      // silent fail
+    }
   }
 
   // ── RENDER ──
