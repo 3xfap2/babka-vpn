@@ -215,6 +215,26 @@
       background-size: cover;
       background-position: center;
     }
+    .plan-card.plan-disabled {
+      opacity: 0.45;
+      pointer-events: none;
+      filter: grayscale(60%);
+      position: relative;
+    }
+    .plan-card.plan-disabled::after {
+      content: '✗ Использована';
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 15px;
+      font-weight: 700;
+      color: rgba(255,255,255,0.7);
+      background: rgba(0,0,0,0.45);
+      border-radius: inherit;
+      letter-spacing: 0.5px;
+    }
     /* Test — keep SVG key pattern */
     .plan-card::before { content: ''; position: absolute; inset: 0; background-repeat: repeat; background-size: 56px 56px; pointer-events: none; }
     .plan-week::before, .plan-month::before, .plan-trial::before { display: none; }
@@ -1086,13 +1106,12 @@
     }
 
     // Disable trial if used or sub active
-    if (userData?.trial_used || subActive) {
-      const tc = document.getElementById('trial-card');
-      if (tc) {
-        tc.style.opacity = '0.4';
-        tc.style.pointerEvents = 'none';
-        const desc = tc.querySelector('.plan-desc');
-        if (desc) desc.textContent = userData?.trial_used ? 'Пробная уже использована' : 'Подписка уже активна';
+    const tc = document.getElementById('trial-card');
+    if (tc) {
+      if (userData?.trial_used || subActive) {
+        tc.classList.add('plan-disabled');
+      } else {
+        tc.classList.remove('plan-disabled');
       }
     }
   }
