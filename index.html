@@ -1053,16 +1053,16 @@
       if (!res.ok) return;
       const fresh = await res.json();
       if (!userData) userData = {};
+
+      // Update all fields from server (always fresh)
       userData.trial_used = fresh.trial_used === true;
-      // re-render trial card only
-      const tc = document.getElementById('trial-card');
-      if (tc) {
-        if (userData.trial_used || userData.sub_active) {
-          tc.classList.add('plan-disabled');
-        } else {
-          tc.classList.remove('plan-disabled');
-        }
-      }
+      userData.sub_active = fresh.sub_active === true;
+      userData.sub_type   = fresh.sub_type || null;
+      userData.sub_end    = fresh.sub_end || null;
+      userData.vpn_key    = fresh.vpn_key || null;
+
+      // Full re-render with fresh data
+      renderUI();
     } catch (e) {
       // silent fail
     }
