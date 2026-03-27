@@ -1042,30 +1042,7 @@
   }
 
   async function fetchFreshUserData() {
-    try {
-      const initData = tg.initData;
-      if (!initData) return;
-      const apiBase = userData?.api_url;
-      if (!apiBase) return;
-      const res = await fetch(`${apiBase}/api/user`, {
-        headers: { 'X-Telegram-Init-Data': initData }
-      });
-      if (!res.ok) return;
-      const fresh = await res.json();
-      if (!userData) userData = {};
-
-      // Update all fields from server (always fresh)
-      userData.trial_used = fresh.trial_used === true;
-      userData.sub_active = fresh.sub_active === true;
-      userData.sub_type   = fresh.sub_type || null;
-      userData.sub_end    = fresh.sub_end || null;
-      userData.vpn_key    = fresh.vpn_key || null;
-
-      // Full re-render with fresh data
-      renderUI();
-    } catch (e) {
-      // silent fail
-    }
+    // No-op: data comes from ?d URL param (generated fresh by bot on each /start or /givekey)
   }
 
   // ── RENDER ──
